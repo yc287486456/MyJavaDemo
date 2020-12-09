@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.cykj.mapper.PeopleMapper">
+    <select id="selectPeople" parameterType="People" resultType="People">
+    select * from people where id=#{id};
+      </select>
+    <select id="selectParmars" resultType="PeopleParmars" resultMap="PeopleParmar">
+        select * from peopleparmas;
+    </select>
+    <resultMap id="PeopleParmar" type="PeopleParmars">
+        <id column="id" property="id"></id>
+        <result column="pjob" property="pjob"></result>
+        <result column="pType" property="pType"></result>
+<!--        //一对多-->
+        <collection property="peopleList" column="pType" ofType="People" select="selectPeopleRole">
+            <id column="id" property="id"></id>
+            <result column="peopleName" property="peopleName"></result>
+            <result column="pSex" property="pSex"></result>
+            <result column="pAccount" property="pAccount"></result>
+            <result column="pPassword" property="pPassword"></result>
+        </collection>
+    </resultMap>
+    <select id="selectPeopleRole" parameterType="java.lang.Integer" resultType="People">
+        select * from people where proleid=#{pType};
+    </select>
+
+    <select id="selectMorePeople" resultType="People" resultMap="parmarsMap">
+        select * from people;
+    </select>
+    <resultMap id="parmarsMap" type="People">
+        <id column="id" property="id"></id>
+        <result column="peopleName" property="peopleName"></result>
+        <result column="pSex" property="pSex"></result>
+        <result column="pAccount" property="pAccount"></result>
+        <result column="pPassword" property="pPassword"></result>
+<!--        //多对一-->
+        <association property="peopleParmars" column="pRoleid" javaType="PeopleParmars" select="selectPeopleParmars">
+            <id column="id" property="id"></id>
+            <result column="pjob" property="pjob"></result>
+            <result column="pType" property="pType"></result>
+        </association>
+    </resultMap>
+    <select id="selectPeopleParmars" parameterType="java.lang.Integer" resultType="PeopleParmars">
+        select * from peopleparmas where pType=#{pRoleid};
+    </select>
+
+
+<!--    方法二-->
+    <select id="selectOneMore" resultMap="oneMany">
+        select p.*,p1.* from peopleparmas p1 left join people p on p.pRoleid=p1.pType;
+    </select>
+    <resultMap id="oneMany" type="PeopleParmars">
+        <id column="id" property="id"></id>
+        <result column="pjob" property="pjob"></result>
+       <collection property="peopleList" column="pType" ofType="People">
+           <id column="id" property="id"></id>
+           <result column="peopleName" property="peopleName"></result>
+           <result column="pSex" property="pSex"></result>
+           <result column="pAccount" property="pAccount"></result>
+           <result column="pPassword" property="pPassword"></result>
+       </collection>
+    </resultMap>
+
+    <select id="selectMoreOne" resultMap="manyOne">
+        select * from people p left join peopleparmas p1 on p.pRoleid=p1.pType;
+    </select>
+    <resultMap id="manyOne" type="People">
+        <id column="id" property="id"></id>
+        <result column="peopleName" property="peopleName"></result>
+        <result column="pSex" property="pSex"></result>
+        <result column="pAccount" property="pAccount"></result>
+        <result column="pPassword" property="pPassword"></result>
+        <association property="peopleParmars"  javaType="PeopleParmars">
+            <id column="id" property="id"></id>
+            <result column="pjob" property="pjob"></result>
+            <result column="pType" property="pType"></result>
+        </association>
+    </resultMap>
+<!--    <update id="updateUser" parameterType="User">-->
+<!--        update  user where-->
+<!--        <set>-->
+<!--            <if test="name!=null">-->
+<!--                name=#{name},-->
+<!--            </if>-->
+<!--            <if test="account!=null">-->
+<!--                account=#{account},-->
+<!--            </if>-->
+<!--            <if test="age!=null">-->
+<!--                age=#{age},-->
+<!--            </if>-->
+<!--            <if test="password!=null">-->
+<!--                password=#{password}-->
+<!--            </if>-->
+<!--        </set>-->
+<!--        <where>-->
+<!--            id=#{id};-->
+<!--        </where>-->
+<!--    </update>-->
+<!--    <select id="userList" resultType="User" parameterType="User">-->
+<!--        select * from user-->
+<!--        <if test="id !=null">-->
+<!--            where id=#{id};-->
+<!--        </if>-->
+<!--    </select>-->
+<!--    -->
+<!--    <select id="userList" resultType="User" parameterType="User">-->
+<!--        select * from user-->
+<!--        <choose>-->
+<!--            <when test="name !=null">-->
+<!--                and name like #{name}-->
+<!--            </when>-->
+<!--            <otherwise>-->
+<!--                and id=6-->
+<!--            </otherwise>-->
+<!--        </choose>-->
+<!--    </select>-->
+<!--    &lt;!&ndash;prefix:前缀覆盖并增加其内容-->
+<!--suffix:后缀覆盖并增加其内容-->
+<!--prefixOverrides :前缀判断的条件-->
+<!--suffxOverrides:后缀判断的条件&ndash;&gt;-->
+<!--    <select id="userList" resultType="User" parameterType="User">-->
+<!--        select * from user-->
+<!--        <if test="id !=null">-->
+<!--            <where>-->
+<!--                id=#{id};-->
+<!--            </where>-->
+<!--        </if>-->
+<!--    </select>-->
+<!--    <update id="updateDemo"  parameterType="User">-->
+<!--        update  user-->
+<!--        <trim prefix="set" prefixOverrides=",">-->
+<!--            ,name=#{name}-->
+<!--        </trim>-->
+<!--        <where>-->
+<!--            id=#{id}-->
+<!--        </where>-->
+<!--    </update>-->
+<!--    <select id="foreach" parameterType="list" resultType="User">-->
+<!--        select * from user where id in-->
+<!--        <foreach collection="list" item="i" open="(" separator="," close= ")">-->
+<!--            #{i}-->
+<!--        </foreach>-->
+<!--    </select>-->
+<!--&lt;!&ndash;    <分页>&ndash;&gt;-->
+<!--    <select id="foreach"  resultMap="User">-->
+<!--        select * from user-->
+<!--    </select>-->
+<!--    <resultMap id="User" type="User">-->
+<!--        <result property="id" column="id"></result>-->
+<!--        <result property="id" column="id"></result>-->
+<!--    </resultMap>-->
+</mapper>

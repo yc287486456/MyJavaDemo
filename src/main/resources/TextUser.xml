@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root >
+    <table name="com.cykj.bean.User">
+        <property name="name" column="name" order="1"/>
+        <property name="account" column="account" order="2"/>
+        <property name="password" column="password" order="3"/>
+    </table>
+</root>
